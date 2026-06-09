@@ -1,0 +1,13 @@
+name: ObscureRTPQ
+version: '1.21.11'
+main: obscure.main.ObscureRTPQ
+api-version: '1.21'
+load: POSTWORLD
+
+softdepend: [ObscureTeleport, Multiverse-Core]
+
+commands:
+  rtpq:
+    description: Join the random teleport matchmaking queue.
+    aliases: [queue, rtpqueue]
+    permission: obscurertpq.use

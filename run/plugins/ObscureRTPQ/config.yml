@@ -1,0 +1,19 @@
+# ObscureRTPQ Configuration
+
+# Debug Mode: Set to true to test matchmaking entirely by yourself.
+# When enabled, joining the queue will instantly simulate finding a match.
+debug-mode: true
+
+messages:
+  queue-join: '&aYou joined the RTP Queue. Waiting for an opponent...'
+  queue-leave: '&cYou left the RTP Queue.'
+  already-in-queue: '&cYou are already in the queue!'
+  match-found: '&6Match found! Finding a safe location...'
+  match-start: '&eMatch started against %opponent%!'
+
+# Sound format: SOUND_NAME, volume, pitch
+# Sound names must match official Spigot names (e.g., ENTITY_EXPERIENCE_ORB_PICKUP, BLOCK_NOTE_BLOCK_CHIME)
+sounds:
+  queue-join: BLOCK_NOTE_BLOCK_CHIME, 1.0, 1.0
+  queue-leave: BLOCK_NOTE_BLOCK_BASS, 1.0, 0.5
+  match-found: ENTITY_PLAYER_LEVELUP, 1.0, 1.0
