@@ -1,10 +1,12 @@
 package obscure.main;
 
 import obscure.command.QueueCommand;
+import obscure.manager.QueueConfigMenu; // Import the menu
 import obscure.manager.QueueManager;
-import obscure.provider.RtpProvider;
 import obscure.provider.ObscureTeleportsProvider;
+import obscure.provider.RtpProvider;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,15 +15,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.CompletableFuture;
-import org.bukkit.Location;
 
 public final class ObscureRTPQ extends JavaPlugin implements Listener {
 
     private QueueManager queueManager;
+    private QueueConfigMenu configMenu; // Instance holder
 
     @Override
     public void onEnable() {
-        // Save config.yml if it doesn't exist
         saveDefaultConfig();
 
         RtpProvider provider;
@@ -34,8 +35,13 @@ public final class ObscureRTPQ extends JavaPlugin implements Listener {
         }
 
         this.queueManager = new QueueManager(this, provider);
-        getCommand("rtpq").setExecutor(new QueueCommand(queueManager));
+        this.configMenu = new QueueConfigMenu(this); // Initialize menu
+
+        // Pass the menu instance straight into the command parser
+        getCommand("rtpq").setExecutor(new QueueCommand(queueManager, configMenu));
+
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(configMenu, this); // Register menu events
 
         getLogger().info("ObscureRTPQ extension fully initialized.");
     }
@@ -50,7 +56,6 @@ public final class ObscureRTPQ extends JavaPlugin implements Listener {
         queueManager.removeFromQueue(event.getPlayer().getUniqueId());
     }
 
-    // Helper method to pull sounds out of the config file safely
     public void playConfigSound(Player player, String configPath) {
         String soundData = getConfig().getString("sounds." + configPath);
         if (soundData == null || soundData.isEmpty()) return;

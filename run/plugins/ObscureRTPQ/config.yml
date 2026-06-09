@@ -17,3 +17,7 @@ sounds:
   queue-join: BLOCK_NOTE_BLOCK_CHIME, 1.0, 1.0
   queue-leave: BLOCK_NOTE_BLOCK_BASS, 1.0, 0.5
   match-found: ENTITY_PLAYER_LEVELUP, 1.0, 1.0
+enabled-worlds:
+- world_nether
+- world_the_end
+- world

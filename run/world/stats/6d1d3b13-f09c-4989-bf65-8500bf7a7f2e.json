@@ -1,27 +1,32 @@
 {
   "stats": {
-    "minecraft:custom": {
-      "minecraft:sprint_one_cm": 3655,
-      "minecraft:time_since_rest": 4270,
-      "minecraft:walk_one_cm": 8336,
-      "minecraft:total_world_time": 4270,
-      "minecraft:leave_game": 3,
-      "minecraft:fly_one_cm": 3744,
-      "minecraft:mob_kills": 1,
-      "minecraft:play_time": 4270,
-      "minecraft:damage_dealt": 1133,
-      "minecraft:jump": 27,
-      "minecraft:time_since_death": 4270
-    },
-    "minecraft:killed": {
-      "minecraft:iron_golem": 1
-    },
     "minecraft:used": {
       "minecraft:copper_sword": 17
     },
     "minecraft:picked_up": {
       "minecraft:poppy": 1,
+      "minecraft:arrow": 1,
       "minecraft:iron_ingot": 4
+    },
+    "minecraft:killed": {
+      "minecraft:skeleton": 1,
+      "minecraft:iron_golem": 1
+    },
+    "minecraft:custom": {
+      "minecraft:time_since_rest": 6330,
+      "minecraft:walk_one_cm": 14762,
+      "minecraft:leave_game": 5,
+      "minecraft:mob_kills": 2,
+      "minecraft:walk_under_water_one_cm": 2230,
+      "minecraft:play_time": 6330,
+      "minecraft:damage_dealt": 1511,
+      "minecraft:jump": 47,
+      "minecraft:time_since_death": 6330,
+      "minecraft:sprint_one_cm": 5843,
+      "minecraft:swim_one_cm": 9,
+      "minecraft:total_world_time": 6330,
+      "minecraft:fly_one_cm": 7058,
+      "minecraft:walk_on_water_one_cm": 815
     }
   },
   "DataVersion": 4671
