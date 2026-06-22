@@ -1,37 +1,91 @@
 # ObscureRTPQ
 
-ObscureRTPQ is a high-performance, asynchronous matchmaking queue extension designed for modern Spigot and Paper Minecraft servers targeting **Minecraft 1.21+**. 
+ObscureRTPQ is a high-performance, asynchronous matchmaking queue extension built for modern Spigot and Paper Minecraft server platforms targeting **Minecraft 1.21+**.
 
-Operating as an optional companion extension, this plugin introduces a competitive "Crystal PvP" style matchmaking loop. It pairs players automatically via non-blocking collection arrays and utilizes a decoupled, thread-safe teleportation worker to place matched players into identical random coordinates with a customizable structural safety offset.
+It provides a competitive "Crystal PvP" style matchmaking loop that pairs players using non-blocking concurrent collection arrays. Matched players are seamlessly distributed into identical random coordinates with a structural safety coordinate offset. The plugin features full runtime customization using an in-game GUI inventory menu that interfaces natively with both default server worlds and custom worlds managed by **Multiverse-Core**.
 
 ---
 
 ## 🛠️ Features Implemented
 
-* **Thread-Safe Matchmaking:** Built on an isolated `ConcurrentLinkedQueue` sequence inside the `QueueManager` to handle rapid player updates without thread contention or memory leaks.
-* **Asynchronous Location Checking (`RtpProvider`):** Offloads demanding world coordinate safety verification to a background `CompletableFuture` thread, keeping heavy chunks and blocks from causing server lag or main-thread TPS drops.
-* **Modular Soft-Dependency Architecture:** Dynamically references your main `ObscureTeleport` plugin instance upon startup. If the main plugin is absent, it seamlessly switches to an optimized internal random coordinate generator without throwing errors or breaking lifecycle execution.
-* **Isolated Administrator Debug Layer:** Built-in loop test parameters allow an admin to run `/rtpq debug` to toggle a solo testing script. While active, entering the queue immediately executes dummy matchmaking behaviors to verify text strings, audio profiles, and teleport vectors entirely alone.
-* **Audio Profiles & Text Localization:** Features an automatic `config.yml` generator with native color translation capabilities (`&`) and active dynamic replacements (such as `%opponent%`).
+* **Thread-Safe Matchmaking Queue:** Backed by an isolated `ConcurrentLinkedQueue` sequence inside the `QueueManager` to manage swift entry updates cleanly without thread contention, memory deadlocks, or lag spikes.
+* **Asynchronous Coordinate Processing (`RtpProvider`):** Offloads heavy world block verification calculations to a background `CompletableFuture` worker thread, ensuring main-thread TPS remains unaffected while processing teleport safety frames.
+* **Seamless Multiverse-Core Integration:** Built to load post-world (`POSTWORLD`), allowing it to automatically recognize, register, and interface with custom imported or generated Multiverse worlds right out of the box.
+* **In-Game Admin Configuration GUI Menu:** Administrators can execute `/rtpq config` to pull up an interactive chest inventory displaying all active worlds. Clicking options dynamically updates and saves active matching worlds to the server disk in real-time.
+* **Strict World Guard Restrictions:** Restricts queue actions via dedicated runtime validation checks. Players cannot join the queue from unlisted worlds, and players who shift between worlds while sitting in the queue are automatically filtered out safely.
+* **Isolated Administrative Debug Layer:** Admins can trigger `/rtpq debug` to toggle a solo matching script. While active, joining the queue simulates finding a dummy match instantly to test chat strings, target locations, offsets, and audio sound mechanics completely alone.
 
 ---
 
 ## 📂 File Structure Registry
 
-Ensure your project conforms exactly to this folder layout under your `src/` tree to prevent `ClassNotFoundException` compiler errors:
+Ensure your project complies exactly with this layout under your project's `src/` directory tree to prevent compilation path problems:
 
 ```text
 src/main/
 ├── java/
-│   └── main/
-│       ├── ObscureRTPQ.java        # Core lifecycle initialization & listener management
+│   └── obscure/
+│       ├── main/
+│       │   └── ObscureRTPQ.java        # Main lifecycle initialization & audio dispatch layer
 │       ├── command/
-│       │   └── QueueCommand.java   # Command evaluation parser & subcommand delegation
+│       │   └── QueueCommand.java       # Command evaluation parser & subcommand routing
 │       ├── manager/
-│       │   └── QueueManager.java   # Core state array control, matchmaking loops & math offsets
+│       │   ├── QueueManager.java       # State tracking, matchmaking loops & world guard checks
+│       │   └── QueueConfigMenu.java    # Interactive dynamic inventory GUI menu controller
 │       └── provider/
-│           ├── RtpProvider.java    # Contract definition layer for safe teleportation hooks
-│           └── ObscureTeleportsProvider.java # Dedicated integration bridge to ObscureTeleport
+│           ├── RtpProvider.java        # Asynchronous contract definition abstract layer
+│           └── ObscureTeleportsProvider.java # Dedicated integration bridge for ObscureTeleport
 └── resources/
-    ├── plugin.yml                  # Spigot bootstrap registries, parameters & dependency trees
-    └── config.yml                  # File configuration mappings, audios, and messages
+    ├── plugin.yml                  # Spigot bootstrap definitions, softdependencies & load order
+    └── config.yml                  # Config file storage for messages, audio profiles, and enabled worlds
+
+🎮 Commands & Permission Nodes
+Command	Aliases	Required Permission	Description
+/rtpq	/queue, /rtpqueue	obscurertpq.use	Enters or exits the active matchmaking queue sequence.
+/rtpq config	None	obscurertpq.admin	Launches the interactive in-game world toggle config menu.
+/rtpq debug	None	obscurertpq.admin	Toggles the solo diagnostic matchmaking simulation mode live.
+
+    ⚠️ Command Namespace Resolution: If another plugin registers a conflicting /queue namespace on your network, ObscureRTPQ takes priority because it loads post-world. If users ever need to call this extension directly, they can explicitly reference the namespace fallback: /obscurertpq:rtpq.
+
+⚙️ Configuration Mappings (config.yml)
+
+This file is automatically generated in your plugin folder on startup if it does not already exist.
+YAML
+
+# ObscureRTPQ Configuration
+
+# Debug Mode: Set to true to test matchmaking entirely by yourself.
+# When enabled, joining the queue will instantly simulate finding a match.
+debug-mode: false
+
+messages:
+  queue-join: "&aYou joined the RTP Queue. Waiting for an opponent..."
+  queue-leave: "&cYou left the RTP Queue."
+  already-in-queue: "&cYou are already in the queue!"
+  match-found: "&6Match found! Finding a safe location..."
+  match-start: "&eMatch started against %opponent%!"
+
+# Sound format: SOUND_NAME, volume, pitch
+# Sound names must match official Spigot names (e.g., ENTITY_EXPERIENCE_ORB_PICKUP, BLOCK_NOTE_BLOCK_CHIME)
+sounds:
+  queue-join: "BLOCK_NOTE_BLOCK_CHIME, 1.0, 1.0"
+  queue-leave: "BLOCK_NOTE_BLOCK_BASS, 1.0, 0.5"
+  match-found: "ENTITY_PLAYER_LEVELUP, 1.0, 1.0"
+
+# List of worlds where the queue matchmaker is allowed to function
+enabled-worlds:
+  - "world"
+
+🔄 What to Expect From This Plugin (Lifecycle Pipeline)
+
+    Authorization Verification: A player types /rtpq. The manager matches their current location against the enabled-worlds list from config.yml. If the world is unauthorized, the request is rejected with a warning.
+
+    Dynamic Entry Logic: If authorized, the system cross-checks for duplicate instances. If debug-mode is turned on, the player bypasses the secondary polling array entirely, running an instantaneous simulation sequence instead.
+
+    Queue Pairing Processing: Under standard conditions, once the concurrent collection queue meets the condition size >= 2, the first two unique IDs are polled. The manager runs secondary checks to ensure both players are still online and remain within valid worlds before initializing the match framework.
+
+    Asynchronous Computation: The engine requests a randomized vector target from the designated RtpProvider implementation. The safe destination location calculation runs completely on a background async thread pool.
+
+    Main Thread Convergence & Teleportation: Once the safety validation thread completes, the player contexts are safely handed back down to the main server tick thread. A relative distance layout offset (+3X, +3Z) is dynamically attached to Player 2's vector location to prevent immediate player collision glitches. Both players are simultaneously teleported, and localized victory sound arrays and message strings are dispatched.
+
+    Ghost Handling Cleaners: An integrated background PlayerQuitEvent listener keeps runtime collections clear. If a player abruptly logs out or drops connection while waiting, their unique reference ID is immediately purged to maintain consistent queue health.
